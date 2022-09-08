@@ -1,4 +1,61 @@
 <script setup>
+import { ref, reactive } from "vue";
+
+const currentQuestionIndex = ref(0);
+const questions = reactive([
+  {
+    id: 1,
+    question: "<h1></h1> 是什麼標籤？",
+    answers: [
+      { text: "標題", isCorrect: true },
+      { text: "段落", isCorrect: false },
+      { text: "連結", isCorrect: false },
+      { text: "清單", isCorrect: false },
+    ],
+  },
+  {
+    id: 2,
+    question: "<p></p> 是什麼標籤？",
+    answers: [
+      { text: "標題", isCorrect: false },
+      { text: "段落", isCorrect: true },
+      { text: "連結", isCorrect: false },
+      { text: "清單", isCorrect: false },
+    ],
+  },
+  {
+    id: 3,
+    question: "<a></a> 是什麼標籤？",
+    answers: [
+      { text: "標題", isCorrect: false },
+      { text: "段落", isCorrect: false },
+      { text: "連結", isCorrect: true },
+      { text: "清單", isCorrect: false },
+    ],
+  },
+  {
+    id: 4,
+    question: "<ul></ul> 是什麼標籤？",
+    answers: [
+      { text: "標題", isCorrect: false },
+      { text: "段落", isCorrect: false },
+      { text: "連結", isCorrect: false },
+      { text: "清單", isCorrect: true },
+    ],
+  },
+]);
+
+const prevQuestion = () => {
+  if (currentQuestionIndex.value > 0) {
+    currentQuestionIndex.value--;
+  }
+};
+
+const nextQuestion = () => {
+  if (currentQuestionIndex.value < questions.length - 1) {
+    currentQuestionIndex.value++;
+  }
+};
 </script>
 
 <template>
@@ -17,7 +74,10 @@
         text-xl text-slate-700
       "
     >
-      <span>第 1 題，已回答 1 題，合共 10 題。</span>
+      <span
+        >第 {{ currentQuestionIndex + 1 }} 題，已回答 0 題，合共
+        {{ questions.length }} 題。</span
+      >
       <button
         class="
           bg-blue-700
@@ -45,10 +105,12 @@
       "
     >
       <h2 class="p-6 bg-blue-800 text-white font-bold text-3xl">
-        JavaScript 與 Java 有什麼關係？
+        {{ questions[currentQuestionIndex].question }}
       </h2>
       <ul>
         <li
+          v-for="(answer, index) in questions[currentQuestionIndex].answers"
+          :key="index"
           class="
             p-6
             bg-slate-50
@@ -58,53 +120,26 @@
             cursor-pointer
           "
         >
-          JavaScript 是 Java 的一個 Library
-        </li>
-        <li
-          class="
-            p-6
-            bg-slate-50
-            border-b-2 border-white
-            text-2xl text-slate-700
-            hover:bg-slate-300
-            cursor-pointer
-          "
-        >
-          JavaScript 使用 Java 語言
-        </li>
-        <li
-          class="
-            p-6
-            bg-slate-50
-            border-b-2 border-white
-            text-2xl text-slate-700
-            hover:bg-slate-300
-            cursor-pointer
-          "
-        >
-          JavaScript 與 Java 沒有關係
-        </li>
-        <li
-          class="
-            p-6
-            bg-slate-50
-            border-b-2 border-white
-            text-2xl text-slate-700
-            hover:bg-slate-300
-            cursor-pointer
-          "
-        >
-          JavaScript 與 Java 由相同的公司所開發
+          {{ answer.text }}
         </li>
       </ul>
     </div>
 
     <div class="flex mt-12 mb-6">
       <ul class="flex bg-slate-300 rounded-xl overflow-hidden">
-        <li class="hover:bg-slate-400 px-4 py-3 cursor-pointer">
+        <li
+          class="px-4 py-3 cursor-pointer"
+          :class="{
+            'cursor-not-allowed hover:bg-slate-300 text-slate-300':
+              currentQuestionIndex === 0,
+            'hover:bg-slate-400': false,
+          }"
+          @click="prevQuestion"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="inline-block w-4 h-4"
+            :class="{ 'fill-slate-400': currentQuestionIndex === 0 }"
             viewBox="0 0 24 24"
           >
             <path
@@ -112,10 +147,21 @@
             ></path>
           </svg>
         </li>
-        <li class="hover:bg-slate-400 px-4 py-3 cursor-pointer">
+        <li
+          class="px-4 py-3 cursor-pointer"
+          :class="{
+            'cursor-not-allowed hover:bg-slate-300 text-slate-300':
+              currentQuestionIndex === questions.length - 1,
+            'hover:bg-slate-400': currentQuestionIndex !== questions.length - 1,
+          }"
+          @click="nextQuestion"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="inline-block w-4 h-4"
+            :class="{
+              'fill-slate-400': currentQuestionIndex === questions.length - 1,
+            }"
             viewBox="0 0 24 24"
           >
             <path
