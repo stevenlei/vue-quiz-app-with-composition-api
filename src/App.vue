@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 
 const currentQuestionIndex = ref(0);
 const questions = reactive([
@@ -12,6 +12,7 @@ const questions = reactive([
       { text: "連結", isCorrect: false },
       { text: "清單", isCorrect: false },
     ],
+    selectedIndex: null,
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ const questions = reactive([
       { text: "連結", isCorrect: false },
       { text: "清單", isCorrect: false },
     ],
+    selectedIndex: null,
   },
   {
     id: 3,
@@ -32,6 +34,7 @@ const questions = reactive([
       { text: "連結", isCorrect: true },
       { text: "清單", isCorrect: false },
     ],
+    selectedIndex: null,
   },
   {
     id: 4,
@@ -42,6 +45,7 @@ const questions = reactive([
       { text: "連結", isCorrect: false },
       { text: "清單", isCorrect: true },
     ],
+    selectedIndex: null,
   },
 ]);
 
@@ -54,6 +58,19 @@ const prevQuestion = () => {
 const nextQuestion = () => {
   if (currentQuestionIndex.value < questions.length - 1) {
     currentQuestionIndex.value++;
+  }
+};
+
+const answeredQuestions = computed(() => {
+  return questions.filter((one) => one.selectedIndex !== null).length;
+});
+
+const selectAnswer = (questionIndex, answerIndex) => {
+  if (questions[questionIndex].selectedIndex == answerIndex) {
+    // de-select
+    questions[questionIndex].selectedIndex = null;
+  } else {
+    questions[questionIndex].selectedIndex = answerIndex;
   }
 };
 </script>
@@ -75,8 +92,8 @@ const nextQuestion = () => {
       "
     >
       <span
-        >第 {{ currentQuestionIndex + 1 }} 題，已回答 0 題，合共
-        {{ questions.length }} 題。</span
+        >第 {{ currentQuestionIndex + 1 }} 題，已回答
+        {{ answeredQuestions }} 題，合共 {{ questions.length }} 題。</span
       >
       <button
         class="
@@ -119,6 +136,11 @@ const nextQuestion = () => {
             hover:bg-slate-300
             cursor-pointer
           "
+          :class="{
+            'bg-slate-300':
+              questions[currentQuestionIndex].selectedIndex === index,
+          }"
+          @click="selectAnswer(currentQuestionIndex, index)"
         >
           {{ answer.text }}
         </li>
@@ -132,7 +154,7 @@ const nextQuestion = () => {
           :class="{
             'cursor-not-allowed hover:bg-slate-300 text-slate-300':
               currentQuestionIndex === 0,
-            'hover:bg-slate-400': false,
+            'hover:bg-slate-400': currentQuestionIndex !== 0,
           }"
           @click="prevQuestion"
         >
