@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 
 const currentQuestionIndex = ref(0);
 const isSubmitted = ref(false);
@@ -43,6 +43,12 @@ const score = computed(() => {
       100,
     1
   );
+});
+
+onMounted(async () => {
+  const response = await fetch("https://codingstartup.com/quiz/data.php");
+  const data = await response.json();
+  questions.push(...data);
 });
 </script>
 
@@ -102,9 +108,10 @@ const score = computed(() => {
             <li
               v-for="(answer, index) in questions[currentQuestionIndex].answers"
               :key="index"
-              class="p-6 bg-slate-50 border-b-2 border-white text-2xl text-slate-700 hover:bg-slate-300 cursor-pointer"
+              class="p-6 border-b-2 border-white text-2xl text-slate-700 hover:bg-slate-300 cursor-pointer"
               :class="{
                 'bg-slate-300': questions[currentQuestionIndex].selectedIndex === index,
+                'bg-slate-50': questions[currentQuestionIndex].selectedIndex !== index,
               }"
               @click="selectAnswer(currentQuestionIndex, index)"
             >
